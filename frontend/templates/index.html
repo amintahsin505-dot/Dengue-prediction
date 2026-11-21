@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#07131f"><title>Dengue Watch BD | Early Warning System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<div class="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <a class="brand" href="#overview"><span class="brand-mark">DW</span><span><b>DENGUE WATCH</b><small>BANGLADESH · EARLY WARNING</small></span></a>
+    <div class="side-label">WORKSPACE</div>
+    <nav class="nav-list">
+      <a class="nav-link active" href="#overview"><span>◫</span> Overview</a>
+      <a class="nav-link" href="#risk-map"><span>⌖</span> Risk map</a>
+      <a class="nav-link" href="#prediction"><span>⌁</span> AI prediction</a>
+      <a class="nav-link" href="#analytics"><span>▥</span> Analytics</a>
+      <a class="nav-link" href="#data-explorer"><span>▤</span> Data explorer</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="status-card"><span class="pulse"></span><div><b id="system-status">Connecting...</b><small>Local prediction engine</small></div></div>
+      <div class="side-foot">DENGUE WATCH BD <span>v1.0.0 · HACKATHON BUILD</span></div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar"><button class="mobile-menu" id="mobile-menu" aria-label="Open menu">☰</button><div><div class="eyebrow">PUBLIC HEALTH INTELLIGENCE</div><h1>Outbreak surveillance</h1></div><div class="top-actions"><span class="live-pill"><i></i> DATASET CONNECTED</span><span class="date-chip" id="today-label">--</span></div></header>
+
+    <section class="hero-strip"><div><div class="eyebrow lime">AI-POWERED EARLY WARNING</div><h2>See the risk before the rise.</h2><p>Ward-level dengue intelligence powered by weather patterns, environmental vulnerability and historical case trends.</p></div><div class="hero-art"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="hero-core">D<span>+</span></div><div class="orbit-dot dot-a"></div><div class="orbit-dot dot-b"></div></div></section>
+
+    <div class="data-warning" id="data-warning">Historical source data only. Predictions use the most recent available dataset observations, not live 2026 weather.</div>
+    <section class="section-block" id="overview">
+      <div class="section-heading"><div><div class="eyebrow">NATIONAL SNAPSHOT</div><h2>Situation overview</h2></div><div class="updated-label">Latest dataset: <b id="latest-date">Loading...</b></div></div>
+      <div class="kpi-grid">
+        <article class="kpi-card"><div class="kpi-top"><span>Total recorded cases</span><span class="kpi-icon mint">✚</span></div><strong id="total-cases">—</strong><small>Across all observations</small></article>
+        <article class="kpi-card"><div class="kpi-top"><span>Latest week cases</span><span class="kpi-icon blue">⌁</span></div><strong id="weekly-cases">—</strong><small>Most recent reporting week</small></article>
+        <article class="kpi-card"><div class="kpi-top"><span>High-risk wards</span><span class="kpi-icon orange">⚑</span></div><strong id="high-risk">—</strong><small>High + Critical · 4-week outlook</small></article>
+        <article class="kpi-card"><div class="kpi-top"><span>Critical wards</span><span class="kpi-icon red">!</span></div><strong id="critical-wards">—</strong><small>Immediate attention recommended</small></article>
+      </div>
+    </section>
+
+    <section class="section-block" id="risk-map">
+      <div class="section-heading"><div><div class="eyebrow">GEOSPATIAL MONITORING</div><h2>Ward-level risk map</h2><p class="section-subtitle">Explore predicted risk tiers across the covered cities.</p></div><div class="control-inline"><label for="forecast-as-of">As of</label><input type="date" id="forecast-as-of"><label for="map-horizon">Forecast</label><select id="map-horizon"><option value="4">Next 4 weeks</option><option value="2">Next 2 weeks</option></select></div></div>
+      <div class="map-layout"><div class="map-panel"><div id="risk-map-canvas"></div><div class="map-note">ⓘ Approximate ward markers — official ward GIS boundaries are not included in the source dataset.</div></div><div class="map-side"><div class="map-side-title">Risk distribution <span id="map-horizon-label">4 weeks</span></div><div class="risk-counts"><div><i class="legend-dot low"></i><span>Low</span><b id="count-low">0</b></div><div><i class="legend-dot medium"></i><span>Medium</span><b id="count-medium">0</b></div><div><i class="legend-dot high"></i><span>High</span><b id="count-high">0</b></div><div><i class="legend-dot critical"></i><span>Critical</span><b id="count-critical">0</b></div></div><div class="map-divider"></div><label class="field-label" for="map-city">Filter by city</label><select id="map-city" class="full-select"><option>All cities</option></select><div class="map-callout"><b>Why this matters</b><p>Rainfall and humidity are considered alongside ward vulnerability and recent dengue history to identify areas needing earlier intervention.</p></div></div></div>
+    </section>
+
+    <section class="section-block" id="prediction">
+      <div class="section-heading"><div><div class="eyebrow">MACHINE LEARNING ENGINE</div><h2>Early warning predictions</h2><p class="section-subtitle">Model inference for each ward using the latest observed data and multi-week lag features.</p></div><div class="control-inline"><label for="prediction-horizon">Prediction window</label><select id="prediction-horizon"><option value="2">2 weeks ahead</option><option value="4" selected>4 weeks ahead</option></select></div></div>
+      <div class="prediction-banner"><div><span class="banner-tag">MODEL VALIDATION</span><h3>Chronological holdout performance</h3><p>Validation uses later dates than training to reduce time leakage.</p></div><div class="metric-pair"><div><small>MAE</small><b id="model-mae">—</b><span>cases</span></div><div><small>RMSE</small><b id="model-rmse">—</b><span>cases</span></div></div></div>
+      <div class="table-card"><div class="table-toolbar"><div><b>Highest-risk wards</b><small>Sorted by predicted ward-level case counts</small></div><div class="toolbar-right"><input id="risk-search" type="search" placeholder="Search city or ward..."><button class="btn-outline" id="download-risk">Export CSV</button></div></div><div class="table-wrap"><table><thead><tr><th>WARD / CITY</th><th>RISK LEVEL</th><th>RISK SCORE</th><th>PREDICTED CASES</th><th>WEATHER DRIVERS (4W RAIN · TEMP · HUMIDITY)</th><th>FORECAST DATE</th></tr></thead><tbody id="risk-table"><tr><td colspan="6" class="empty-cell">Loading predictions...</td></tr></tbody></table></div></div>
+    </section>
+
+    <section class="section-block" id="analytics">
+      <div class="section-heading"><div><div class="eyebrow">HISTORICAL SIGNALS</div><h2>Weather & dengue analytics</h2><p class="section-subtitle">Explore how weekly case counts move alongside local weather conditions.</p></div><div class="control-inline"><label for="analytics-city">City</label><select id="analytics-city"><option>All cities</option></select></div></div>
+      <div class="chart-grid"><article class="chart-card wide-chart"><div class="chart-head"><div><b>Weekly dengue cases</b><small>Historical case observations</small></div><span class="chart-unit">CASES / WEEK</span></div><canvas id="cases-chart"></canvas></article><article class="chart-card"><div class="chart-head"><div><b>Weather indicators</b><small>Mean weekly values</small></div><span class="chart-unit">WEATHER</span></div><canvas id="weather-chart"></canvas></article></div>
+      <div class="insight-grid"><article class="insight-card"><span class="insight-icon">🌧</span><div><b>Rainfall lag features</b><p>1–4 week rainfall lags and rolling 2/4-week totals help represent the vector breeding delay.</p></div></article><article class="insight-card"><span class="insight-icon">🌡</span><div><b>Temperature & humidity</b><p>Current values and rolling averages are included as model predictors.</p></div></article><article class="insight-card"><span class="insight-icon">⌂</span><div><b>Ward vulnerability</b><p>Population density, water-logging risk and sanitation score help distinguish neighboring wards.</p></div></article></div>
+    </section>
+
+    <section class="section-block" id="data-explorer">
+      <div class="section-heading"><div><div class="eyebrow">SOURCE DATA ACCESS</div><h2>Dataset explorer</h2><p class="section-subtitle">Search by date, city and ward. Every supplied dataset field is available below.</p></div><button class="btn-primary" id="export-all">↓ Download filtered data</button></div>
+      <div class="filter-card"><div class="filter-field"><label for="filter-date">Exact date</label><input type="date" id="filter-date"></div><div class="filter-field"><label for="filter-city">City</label><select id="filter-city"><option>All cities</option></select></div><div class="filter-field"><label for="filter-ward">Ward</label><select id="filter-ward"><option>All wards</option></select></div><div class="filter-field"><label for="filter-search">Search</label><input type="search" id="filter-search" placeholder="City or ward name"></div><button class="btn-primary" id="apply-filters">Search records</button><button class="btn-ghost" id="reset-filters">Reset</button></div>
+      <div class="table-card"><div class="table-toolbar"><div><b>Raw dataset records</b><small id="record-count">Loading...</small></div><div class="toolbar-right"><button class="btn-outline" id="prev-page">← Previous</button><button class="btn-outline" id="next-page">Next →</button></div></div><div class="table-wrap data-table-wrap"><table><thead><tr><th>DATE</th><th>CITY</th><th>WARD ID</th><th>POP. DENSITY / KM²</th><th>WATER LOGGING RISK</th><th>SANITATION SCORE</th><th>AVG TEMP °C</th><th>MAX TEMP °C</th><th>MIN TEMP °C</th><th>RAINFALL MM</th><th>REL. HUMIDITY %</th><th>DENGUE CASES</th></tr></thead><tbody id="data-table"><tr><td colspan="12" class="empty-cell">Loading dataset...</td></tr></tbody></table></div></div>
+    </section>
+
+    <footer class="footer"><div><b>DENGUE WATCH BD</b><span>AI for Urban Dengue Outbreak · Hackathon Prototype</span></div><p>Decision-support prototype only. Predictions are not medical diagnoses or official public-health alerts.</p></footer>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body></html>
